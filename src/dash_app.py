@@ -60,7 +60,7 @@ def create_dash_app():
                                       xref="paper", yref="paper", x=0.5, y=0.5)
     
     app.layout = html.Div([
-        html.H1("📈 Stock Data Visualization", 
+        html.H1("📈 Market Data Visualization", 
                 style={'textAlign': 'center', 'color': '#2c3e50', 'marginBottom': '30px'}),
         
         html.Div([

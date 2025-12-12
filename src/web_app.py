@@ -26,10 +26,10 @@ def backtest_detail(data_type, symbol):
 @app.route('/api/backtest-detail/<data_type>/<symbol>')
 def api_backtest_detail(data_type, symbol):
     try:
-        with open('backtest_results.json', 'r') as f:
+        with open('../cache/backtest_results.json', 'r') as f:
             results = json.load(f)
         
-        with open('market_data.json', 'r') as f:
+        with open('../cache/market_data.json', 'r') as f:
             market_data = json.load(f)
         
         if data_type not in results or symbol not in results[data_type]:
@@ -75,7 +75,7 @@ def api_backtest_detail(data_type, symbol):
 @app.route('/api/backtest-results')
 def api_backtest_results():
     try:
-        with open('backtest_results.json', 'r') as f:
+        with open('../cache/backtest_results.json', 'r') as f:
             results = json.load(f)
         return jsonify(results)
     except Exception as e:
@@ -93,11 +93,11 @@ def fetch_data():
         
         # Determine database path
         if data_type == 'stocks':
-            db_path = "database/stock_data.db"
+            db_path = "../database/stock_data.db"
         elif data_type == 'forex':
-            db_path = "database/forex_data.db"
+            db_path = "../database/forex_data.db"
         else:  # commodities
-            db_path = "database/commodity_data.db"
+            db_path = "../database/commodity_data.db"
         
         table_name = symbol.replace('/', '_')
         
@@ -125,7 +125,7 @@ def api_data():
     
     try:
         # Load from JSON cache
-        with open('market_data.json', 'r') as f:
+        with open('../cache/market_data.json', 'r') as f:
             cache_data = json.load(f)
         
         table_name = symbol.replace('/', '_')

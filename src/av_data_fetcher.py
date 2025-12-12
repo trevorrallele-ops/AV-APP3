@@ -65,9 +65,7 @@ class AVDataFetcher:
     def fetch_commodity_data(self, function="WTI"):
         # Use stock data for commodities as Alpha Vantage commodity API is unreliable
         commodity_symbols = {
-            'WTI': 'USO',  # Oil ETF
             'GOLD': 'GLD',  # Gold ETF
-            'BRENT': 'BNO',  # Brent Oil ETF
             'NATURAL_GAS': 'UNG',  # Natural Gas ETF
             'COPPER': 'CPER',  # Copper ETF
             'ALUMINUM': 'JJU'  # Aluminum ETF
