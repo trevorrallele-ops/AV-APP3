@@ -46,15 +46,51 @@ def api_backtest_detail(data_type, symbol):
         equity_curve = [starting_capital]
         total_invested = 0
         total_return = 0
+        returns = []
         
         for trade in trades:
             pnl = trade['outcome_R'] * risk_per_trade
             total_return += pnl
             equity_curve.append(equity_curve[-1] + pnl)
             total_invested += risk_per_trade
+            returns.append(pnl / equity_curve[-2] if equity_curve[-2] > 0 else 0)
         
         final_capital = equity_curve[-1] if equity_curve else starting_capital
         roi_percent = ((final_capital - starting_capital) / starting_capital) * 100
+        
+        # Calculate drawdown
+        drawdown = []
+        peak = equity_curve[0]
+        max_drawdown = 0
+        for value in equity_curve:
+            if value > peak:
+                peak = value
+            dd = (value - peak) / peak
+            drawdown.append(dd)
+            if dd < max_drawdown:
+                max_drawdown = dd
+        
+        # Calculate ratios
+        import math
+        if len(returns) > 1:
+            avg_return = sum(returns) / len(returns)
+            return_std = math.sqrt(sum((r - avg_return) ** 2 for r in returns) / (len(returns) - 1))
+            
+            # Sharpe Ratio (assuming 0% risk-free rate)
+            sharpe_ratio = avg_return / return_std if return_std > 0 else 0
+            
+            # Sortino Ratio (downside deviation)
+            negative_returns = [r for r in returns if r < 0]
+            if negative_returns:
+                downside_std = math.sqrt(sum(r ** 2 for r in negative_returns) / len(negative_returns))
+                sortino_ratio = avg_return / downside_std if downside_std > 0 else 0
+            else:
+                sortino_ratio = 999 if avg_return > 0 else 0
+            
+            # Calmar Ratio
+            calmar_ratio = (roi_percent / 100) / abs(max_drawdown) if max_drawdown < 0 else 999
+        else:
+            sharpe_ratio = sortino_ratio = calmar_ratio = 0
         
         return jsonify({
             'backtest': backtest_result,
@@ -66,7 +102,11 @@ def api_backtest_detail(data_type, symbol):
                 'total_return': total_return,
                 'final_capital': final_capital,
                 'roi_percent': roi_percent,
-                'equity_curve': equity_curve
+                'equity_curve': equity_curve,
+                'max_drawdown_percent': max_drawdown * 100,
+                'sharpe_ratio': sharpe_ratio,
+                'sortino_ratio': sortino_ratio,
+                'calmar_ratio': calmar_ratio
             }
         })
     except Exception as e:

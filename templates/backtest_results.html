@@ -243,6 +243,9 @@
             let totalDollarReturn = 0;
             let totalStartingCapital = 0;
 
+            const startingCapital = parseFloat(document.getElementById('startingCapital')?.value) || 10000;
+            const riskPerTrade = parseFloat(document.getElementById('riskPerTrade')?.value) || 100;
+
             for (const [dataType, symbols] of Object.entries(backtestData)) {
                 // Filter by current market if not 'all'
                 if (currentMarket !== 'all' && dataType !== currentMarket) {
@@ -255,11 +258,9 @@
                     totalR += summary.avg_outcome_R * summary.num_trades;
                     totalWins += summary.win_rate_pos_R * summary.num_trades;
                     
-                    // Use recalculated values if available
-                    if (result.recalculated) {
-                        totalDollarReturn += result.recalculated.total_return;
-                        totalStartingCapital += result.recalculated.starting_capital;
-                    }
+                    // Calculate dollar return for this symbol only
+                    const symbolTotalR = summary.avg_outcome_R * summary.num_trades;
+                    totalDollarReturn += symbolTotalR * riskPerTrade;
                     
                     if (summary.avg_outcome_R > bestR) {
                         bestR = summary.avg_outcome_R;
@@ -270,7 +271,7 @@
 
             const avgR = totalTrades > 0 ? totalR / totalTrades : 0;
             const avgWinRate = totalTrades > 0 ? totalWins / totalTrades : 0;
-            const showDollar = totalStartingCapital > 0;
+            const showDollar = totalTrades > 0;
 
             document.getElementById('summaryStats').innerHTML = `
                 <div class="stat-card">
@@ -452,6 +453,12 @@
             renderResultsGrid();
             renderPerformanceChart();
             renderWinRateChart();
+            
+            // Force chart refresh
+            setTimeout(() => {
+                renderPerformanceChart();
+                renderWinRateChart();
+            }, 100);
         }
 
         function showDetails(dataType, symbol) {
