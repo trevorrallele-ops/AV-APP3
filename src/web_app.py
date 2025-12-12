@@ -15,6 +15,19 @@ def index():
 def dashboard():
     return render_template('interactive_dashboard.html')
 
+@app.route('/backtests')
+def backtests():
+    return render_template('backtest_results.html')
+
+@app.route('/api/backtest-results')
+def api_backtest_results():
+    try:
+        with open('backtest_results.json', 'r') as f:
+            results = json.load(f)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/fetch-data')
 def fetch_data():
     data_type = request.args.get('type', 'stocks')
