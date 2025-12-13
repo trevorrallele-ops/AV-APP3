@@ -339,7 +339,8 @@
                     <div class="color-info">
                         <div id="colorHex">#4ECDC4</div>
                         <div id="colorHsl">hsl(176, 61%, 60%)</div>
-                        <button id="applyBg" onclick="applyBackground()" style="margin-top: 10px; padding: 10px 20px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 600;">🎨 Apply to Background</button>
+                        <button id="applyBg" onclick="applyBackground()" style="margin: 10px 5px; padding: 10px 20px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 600;">🎨 Apply</button>
+                        <button onclick="resetBackground()" style="margin: 10px 5px; padding: 10px 20px; background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 600;">🔄 Reset</button>
                     </div>
                 </div>
             </div>
@@ -407,7 +408,9 @@
             const wheel = document.getElementById('colorWheel');
             const slider = document.getElementById('lightnessSlider');
             
-            wheel.addEventListener('click', function(e) {
+            let isDragging = false;
+            
+            function handleColorChange(e) {
                 const rect = wheel.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
@@ -417,6 +420,21 @@
                 currentHue = Math.round(degrees);
                 rotateWheel(degrees);
                 updateColor();
+            }
+            
+            wheel.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                handleColorChange(e);
+            });
+            
+            wheel.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    handleColorChange(e);
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
             });
             
             slider.addEventListener('input', function(e) {
@@ -442,6 +460,12 @@
             
             document.body.style.background = gradient;
             localStorage.setItem('customBg', gradient);
+        }
+        
+        function resetBackground() {
+            localStorage.removeItem('customBg');
+            document.body.style.background = '';
+            document.body.className = document.body.classList.contains('dark') ? 'dark' : 'light';
         }
     </script>
 </body>

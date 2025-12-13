@@ -345,7 +345,8 @@
                 <div id="colorPreview2" style="width: 60px; height: 60px; border-radius: 10px; background: #4ecdc4; border: 2px solid white;"></div>
             </div>
             <div style="text-align: center; margin-top: 20px;">
-                <button onclick="applyBackground2()" style="padding: 12px 25px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; margin: 5px;">🎨 Apply Background</button>
+                <button onclick="applyBackground2()" style="padding: 12px 25px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; margin: 5px;">🎨 Apply</button>
+                <button onclick="resetBackground2()" style="padding: 12px 25px; background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; margin: 5px;">🔄 Reset</button>
             </div>
         </div>
     </div>
@@ -763,6 +764,13 @@
             closeColorModal();
         }
         
+        function resetBackground2() {
+            localStorage.removeItem('customBg');
+            document.body.style.background = '';
+            document.body.className = document.body.classList.contains('dark') ? 'dark' : 'light';
+            closeColorModal();
+        }
+        
         window.onload = function() {
             // Load saved background
             const savedBg = localStorage.getItem('customBg');
@@ -777,7 +785,9 @@
             const slider2 = document.getElementById('lightnessSlider2');
             
             if (wheel2) {
-                wheel2.addEventListener('click', function(e) {
+                let isDragging2 = false;
+                
+                function handleColorChange2(e) {
                     const rect = wheel2.getBoundingClientRect();
                     const centerX = rect.left + rect.width / 2;
                     const centerY = rect.top + rect.height / 2;
@@ -789,6 +799,21 @@
                     pointer.style.transform = `translateX(-50%) rotate(${degrees}deg)`;
                     pointer.style.transformOrigin = '50% 55px';
                     updateColor2();
+                }
+                
+                wheel2.addEventListener('mousedown', function(e) {
+                    isDragging2 = true;
+                    handleColorChange2(e);
+                });
+                
+                wheel2.addEventListener('mousemove', function(e) {
+                    if (isDragging2) {
+                        handleColorChange2(e);
+                    }
+                });
+                
+                document.addEventListener('mouseup', function() {
+                    isDragging2 = false;
                 });
             }
             
